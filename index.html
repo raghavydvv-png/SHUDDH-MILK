@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0756a5">
+<title>SHUDDH MILK</title>
+<style>
+:root{--blue:#0756a5;--navy:#07356b;--green:#299b50;--bg:#f2f7fc;--ink:#17324d}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,"Noto Sans Devanagari",sans-serif;color:var(--ink)}
+header{background:linear-gradient(120deg,var(--navy),#087bd1);color:white;padding:18px 16px 22px;border-radius:0 0 22px 22px}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:54px;height:54px;border-radius:16px;background:white;color:var(--blue);display:grid;place-items:center;font-size:30px}
+h1{font-size:23px;margin:0;letter-spacing:.5px}header p{margin:4px 0 0;font-size:13px;opacity:.9}
+main{max-width:850px;margin:auto;padding:14px}.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:-2px}
+.stat,.panel,.tile{background:white;border-radius:16px;padding:14px;box-shadow:0 3px 14px #1232}
+.stat b{display:block;font-size:21px;color:var(--blue)}.stat span{font-size:12px;color:#62758a}
+h2{font-size:18px;margin:20px 2px 10px}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.tile{border:0;text-align:left;color:var(--ink);font:inherit;min-height:88px;cursor:pointer}.tile strong{display:block;margin-top:7px}.tile small{color:#687d91}
+.panel{margin-top:12px}.hidden{display:none!important}
+label{display:block;font-size:13px;margin:10px 0 5px;color:#536a80}input,select{width:100%;padding:12px;border:1px solid #d3dfeb;border-radius:10px;font:inherit;background:white}
+button.primary{background:var(--blue);color:white;border:0;padding:12px 16px;border-radius:10px;font:inherit;font-weight:600;margin-top:12px;width:100%;cursor:pointer}
+button.secondary{background:#e7f1fc;color:var(--blue);border:0;padding:8px 11px;border-radius:9px;font:inherit}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.item{padding:10px 0;border-bottom:1px solid #e8eef4;font-size:14px}.muted{color:#708398;font-size:12px}
+nav{position:sticky;bottom:0;background:white;padding:9px;display:flex;justify-content:space-around;box-shadow:0 -3px 15px #1232;margin-top:20px}
+nav button{border:0;background:none;color:#587087;font:inherit;font-size:12px}nav button span{display:block;font-size:20px}
+footer{text-align:center;color:#8092a4;font-size:11px;padding:16px}
+@media(min-width:650px){.stats{grid-template-columns:repeat(4,1fr)}.grid{grid-template-columns:repeat(3,1fr)}}
+</style></head>
+<body>
+<header><div class="brand"><div class="logo">🥛</div><div><h1>SHUDDH MILK</h1><p>शुद्धता का भरोसा, हर बूंद में।</p></div></div></header>
+<div id="loginGate" style="position:fixed;inset:0;background:linear-gradient(135deg,#07356b,#087bd1);z-index:99;display:flex;align-items:center;justify-content:center;padding:22px">
+ <div style="background:white;border-radius:20px;padding:24px;max-width:360px;width:100%;text-align:center">
+  <div style="font-size:42px">🥛</div><h2 style="margin:8px 0">SHUDDH MILK</h2><p class="muted">एडमिन लॉगिन</p>
+  <label style="text-align:left">4 अंकों का PIN</label><input id="loginPin" type="password" inputmode="numeric" maxlength="4" placeholder="डेमो PIN: 1234">
+  <button class="primary" onclick="login()">लॉगिन करें</button>
+  <p class="muted">पहली बार डेमो PIN 1234 है। सेटिंग्स में इसे बदलें।</p>
+ </div>
+</div>
+<main>
+<section id="home">
+<div class="stats">
+<div class="stat"><b id="totalMilk">0 L</b><span>आज का कुल दूध</span></div>
+<div class="stat"><b id="farmerCount">0</b><span>कुल किसान</span></div>
+<div class="stat"><b id="customerCount">0</b><span>कुल ग्राहक</span></div>
+<div class="stat"><b id="todayAmount">₹0</b><span>आज का दूध मूल्य</span></div>
+</div>
+<h2>मुख्य सुविधाएँ</h2>
+<div class="grid">
+<button class="tile" onclick="show('farmers')">👨‍🌾 <strong>किसान प्रबंधन</strong><small>किसान जोड़ें और रिकॉर्ड</small></button>
+<button class="tile" onclick="show('collection')">🥛 <strong>दूध कलेक्शन</strong><small>सुबह / शाम एंट्री</small></button>
+<button class="tile" onclick="show('customers')">👥 <strong>ग्राहक प्रबंधन</strong><small>ग्राहक रिकॉर्ड</small></button>
+<button class="tile" onclick="show('sales')">🛒 <strong>दूध बिक्री</strong><small>बिक्री की एंट्री</small></button>
+<button class="tile" onclick="show('payments')">💳 <strong>पेमेंट / एडवांस</strong><small>भुगतान रिकॉर्ड</small></button>
+<button class="tile" onclick="show('rates')">📊 <strong>रेट चार्ट</strong><small>दूध का प्रति लीटर रेट</small></button>
+<button class="tile" onclick="show('reports')">📒 <strong>रिपोर्ट / पासबुक</strong><small>सभी एंट्री देखें</small></button>
+<button class="tile" onclick="show('settings')">⚙️ <strong>सेटिंग्स</strong><small>डेयरी की जानकारी</small></button>
+</div>
+<div class="panel"><b>नोट:</b> यह शुरुआती मोबाइल-फ्रेंडली प्रोटोटाइप है। इसमें दर्ज डेटा इसी मोबाइल/ब्राउज़र में सेव होता है।</div>
+</section>
+
+<section id="farmers" class="hidden">
+<h2>👨‍🌾 किसान जोड़ें</h2><div class="panel">
+<label>किसान का नाम</label><input id="farmerName" placeholder="नाम लिखें">
+<label>मोबाइल नंबर</label><input id="farmerPhone" inputmode="numeric" placeholder="मोबाइल नंबर">
+<label>गाँव / पता</label><input id="farmerAddress" placeholder="गाँव">
+<button class="primary" onclick="addPerson('farmers')">किसान सेव करें</button></div><div class="panel" id="farmersList"></div>
+</section>
+
+<section id="customers" class="hidden">
+<h2>👥 ग्राहक जोड़ें</h2><div class="panel">
+<label>ग्राहक का नाम</label><input id="customerName" placeholder="नाम लिखें">
+<label>मोबाइल नंबर</label><input id="customerPhone" inputmode="numeric" placeholder="मोबाइल नंबर">
+<label>पता</label><input id="customerAddress" placeholder="पता">
+<button class="primary" onclick="addPerson('customers')">ग्राहक सेव करें</button></div><div class="panel" id="customersList"></div>
+</section>
+
+<section id="collection" class="hidden">
+<h2>🥛 दूध कलेक्शन एंट्री</h2><div class="panel">
+<label>किसान</label><select id="milkPerson"></select>
+<div class="row"><div><label>तारीख</label><input type="date" id="milkDate"></div><div><label>समय</label><select id="shift"><option>सुबह</option><option>शाम</option></select></div></div>
+<div class="row"><div><label>दूध का प्रकार</label><select id="milkType"><option>गाय</option><option>भैंस</option></select></div><div><label>मात्रा (लीटर)</label><input id="litres" type="number" step=".01" placeholder="0.00"></div></div>
+<div class="row"><div><label>FAT</label><input id="fat" type="number" step=".1" placeholder="जैसे 4.0"></div><div><label>SNF</label><input id="snf" type="number" step=".1" placeholder="जैसे 8.5"></div></div>
+<label>रेट (₹ / लीटर)</label><input id="milkRate" type="number" step=".01" placeholder="रेट">
+<button class="primary" onclick="addMilk()">दूध एंट्री सेव करें</button></div><div class="panel" id="milkList"></div>
+</section>
+
+<section id="sales" class="hidden"><h2>🛒 दूध बिक्री</h2><div class="panel">
+<label>ग्राहक</label><select id="salePerson"></select><div class="row"><div><label>तारीख</label><input type="date" id="saleDate"></div><div><label>लीटर</label><input type="number" id="saleLitres" step=".01"></div></div>
+<label>रेट (₹ / लीटर)</label><input type="number" id="saleRate" step=".01"><button class="primary" onclick="addSale()">बिक्री सेव करें</button></div><div class="panel" id="salesList"></div></section>
+
+<section id="payments" class="hidden"><h2>💳 पेमेंट / एडवांस</h2><div class="panel">
+<label>किसान</label><select id="payPerson"></select><div class="row"><div><label>रकम (₹)</label><input type="number" id="payAmount"></div><div><label>प्रकार</label><select id="payType"><option>भुगतान</option><option>एडवांस</option></select></div></div>
+<label>तारीख</label><input type="date" id="payDate"><button class="primary" onclick="addPayment()">रिकॉर्ड सेव करें</button></div><div class="panel" id="paymentsList"></div></section>
+
+<section id="rates" class="hidden"><h2>📊 रेट चार्ट</h2><div class="panel">
+<label>गाय का रेट (₹ / लीटर)</label><input id="cowRate" type="number" step=".01">
+<label>भैंस का रेट (₹ / लीटर)</label><input id="buffaloRate" type="number" step=".01">
+<button class="primary" onclick="saveRates()">रेट सेव करें</button></div></section>
+
+<section id="reports" class="hidden"><h2>📒 रिपोर्ट और पासबुक</h2><div class="panel" id="reportBox"></div><button class="primary" onclick="exportData()">डेटा CSV डाउनलोड करें</button></section>
+<section id="settings" class="hidden"><h2>⚙️ डेयरी सेटिंग्स</h2><div class="panel">
+<label>डेयरी / मालिक का नाम</label><input id="dairyName" placeholder="SHUDDH MILK">
+<label>मोबाइल नंबर</label><input id="dairyPhone" placeholder="मोबाइल नंबर">
+<button class="primary" onclick="saveSettings()">सेटिंग्स सेव करें</button>
+<label>एडमिन PIN बदलें (4 अंक)</label><input id="newPin" type="password" inputmode="numeric" maxlength="4" placeholder="नया PIN">
+<button class="primary" onclick="changePin()">PIN बदलें</button>
+<hr style="border:0;border-top:1px solid #e8eef4;margin:16px 0">
+<b>डेटा बैकअप और रीस्टोर</b>
+<button class="primary" onclick="backupJSON()">पूरा बैकअप डाउनलोड करें (JSON)</button>
+<label>पुराना बैकअप वापस लाएँ</label><input type="file" id="restoreFile" accept=".json,application/json">
+<button class="primary" onclick="restoreJSON()">बैकअप रीस्टोर करें</button>
+<p class="muted">यह PIN केवल इस डिवाइस पर ऐप खोलने का साधारण लॉक है, सुरक्षित ऑनलाइन अकाउंट नहीं। डेटा इसी डिवाइस में रहता है। क्लाउड बैकअप/मल्टी-मोबाइल सिंक के लिए सर्वर अकाउंट और कॉन्फ़िगरेशन अभी जोड़ना बाकी है।</p></div></section>
+</main>
+<nav><button onclick="show('home')"><span>🏠</span>होम</button><button onclick="show('collection')"><span>🥛</span>कलेक्शन</button><button onclick="show('farmers')"><span>👨‍🌾</span>किसान</button><button onclick="show('reports')"><span>📒</span>रिपोर्ट</button></nav>
+<footer>SHUDDH MILK • शुरुआती प्रोटोटाइप</footer>
+<script>
+const $=id=>document.getElementById(id), load=k=>JSON.parse(localStorage.getItem('sm_'+k)||'[]'), save=(k,v)=>localStorage.setItem('sm_'+k,JSON.stringify(v));
+const today=()=>new Date().toISOString().slice(0,10);
+['milkDate','saleDate','payDate'].forEach(x=>$(x).value=today());
+function show(id){document.querySelectorAll('main section').forEach(s=>s.classList.add('hidden'));$(id).classList.remove('hidden');render()}
+function addPerson(type){let prefix=type==='farmers'?'farmer':'customer',name=$(prefix+'Name').value.trim();if(!name)return alert('नाम भरें');let a=load(type);a.push({name,phone:$(prefix+'Phone').value,address:$(prefix+'Address').value});save(type,a);[$(prefix+'Name'),$(prefix+'Phone'),$(prefix+'Address')].forEach(x=>x.value='');render()}
+function addMilk(){let person=$('milkPerson').value,litres=+$('litres').value,rate=+$('milkRate').value;if(!person||litres<=0)return alert('किसान और दूध की मात्रा भरें');let a=load('milk');a.push({person,date:$('milkDate').value,shift:$('shift').value,type:$('milkType').value,litres,fat:$('fat').value,snf:$('snf').value,rate,amount:litres*rate});save('milk',a);$('litres').value='';render()}
+function addSale(){let person=$('salePerson').value,litres=+$('saleLitres').value,rate=+$('saleRate').value;if(!person||litres<=0)return alert('ग्राहक और मात्रा भरें');let a=load('sales');a.push({person,date:$('saleDate').value,litres,rate,amount:litres*rate});save('sales',a);render()}
+function addPayment(){let person=$('payPerson').value,amount=+$('payAmount').value;if(!person||amount<=0)return alert('किसान और रकम भरें');let a=load('payments');a.push({person,date:$('payDate').value,type:$('payType').value,amount});save('payments',a);$('payAmount').value='';render()}
+function saveRates(){save('rates',{cow:$('cowRate').value,buffalo:$('buffaloRate').value});alert('रेट सेव हो गए')}
+function saveSettings(){save('settings',{name:$('dairyName').value,phone:$('dairyPhone').value});alert('सेटिंग्स सेव हो गईं')}
+function list(id,arr,fn){$(id).innerHTML=arr.length?arr.slice().reverse().map(fn).join(''):'<p class="muted">अभी कोई रिकॉर्ड नहीं है।</p>'}
+function render(){
+let f=load('farmers'),c=load('customers'),m=load('milk'),s=load('sales'),p=load('payments');
+$('farmerCount').textContent=f.length;$('customerCount').textContent=c.length;
+let tm=m.filter(x=>x.date===today());$('totalMilk').textContent=tm.reduce((n,x)=>n+x.litres,0).toFixed(2)+' L';$('todayAmount').textContent='₹'+tm.reduce((n,x)=>n+x.amount,0).toFixed(2);
+$('milkPerson').innerHTML=f.map(x=>`<option>${x.name}</option>`).join('');$('payPerson').innerHTML=$('milkPerson').innerHTML;
+$('salePerson').innerHTML=c.map(x=>`<option>${x.name}</option>`).join('');
+list('farmersList',f,x=>`<div class="item"><b>${x.name}</b><br><span class="muted">${x.phone||''} ${x.address||''}</span></div>`);
+list('customersList',c,x=>`<div class="item"><b>${x.name}</b><br><span class="muted">${x.phone||''} ${x.address||''}</span></div>`);
+list('milkList',m,x=>`<div class="item"><b>${x.person}</b> • ${x.date} • ${x.shift}<br>${x.type}: ${x.litres} L | FAT ${x.fat||'-'} | SNF ${x.snf||'-'} | ₹${x.amount.toFixed(2)}</div>`);
+list('salesList',s,x=>`<div class="item"><b>${x.person}</b> • ${x.date}<br>${x.litres} L × ₹${x.rate} = ₹${x.amount.toFixed(2)}</div>`);
+list('paymentsList',p,x=>`<div class="item"><b>${x.person}</b> • ${x.type} • ${x.date}<br>₹${x.amount.toFixed(2)}</div>`);
+let r=load('rates');$('cowRate').value=r.cow||'';$('buffaloRate').value=r.buffalo||'';let st=load('settings');$('dairyName').value=st.name||'';$('dairyPhone').value=st.phone||'';
+$('reportBox').innerHTML=`<div class="item">कुल कलेक्शन: <b>${m.reduce((n,x)=>n+x.litres,0).toFixed(2)} लीटर</b></div><div class="item">कुल दूध मूल्य: <b>₹${m.reduce((n,x)=>n+x.amount,0).toFixed(2)}</b></div><div class="item">कुल बिक्री: <b>₹${s.reduce((n,x)=>n+x.amount,0).toFixed(2)}</b></div><div class="item">कुल पेमेंट / एडवांस: <b>₹${p.reduce((n,x)=>n+x.amount,0).toFixed(2)}</b></div>`;
+}
+function exportData(){let rows=[['प्रकार','नाम','तारीख','मात्रा','FAT','SNF','रेट','रकम']];load('milk').forEach(x=>rows.push(['कलेक्शन',x.person,x.date,x.litres,x.fat,x.snf,x.rate,x.amount]));load('sales').forEach(x=>rows.push(['बिक्री',x.person,x.date,x.litres,'','',x.rate,x.amount]));load('payments').forEach(x=>rows.push([x.type,x.person,x.date,'','','','',x.amount]));let csv='\ufeff'+rows.map(r=>r.map(v=>'"'+String(v??'').replaceAll('"','""')+'"').join(',')).join('\n');let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='shuddh-milk-report.csv';a.click()}
+
+function login(){
+ const entered=$('loginPin').value;
+ const saved=localStorage.getItem('sm_admin_pin')||'1234';
+ if(entered===saved){$('loginGate').style.display='none';$('loginPin').value='';}
+ else alert('गलत PIN। फिर कोशिश करें।');
+}
+function changePin(){
+ const p=$('newPin').value;
+ if(!/^\d{4}$/.test(p))return alert('कृपया 4 अंकों का PIN डालें।');
+ localStorage.setItem('sm_admin_pin',p);$('newPin').value='';alert('नया PIN सेव हो गया।');
+}
+function backupJSON(){
+ const keys=['farmers','customers','milk','sales','payments','rates','settings'];
+ const data={app:'SHUDDH MILK',version:2,createdAt:new Date().toISOString(),data:{}};
+ keys.forEach(k=>data.data[k]=load(k));
+ const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+ a.download='SHUDDH-MILK-backup-'+today()+'.json';a.click();URL.revokeObjectURL(a.href);
+}
+function restoreJSON(){
+ const file=$('restoreFile').files[0];if(!file)return alert('पहले बैकअप JSON फाइल चुनें।');
+ if(!confirm('मौजूदा रिकॉर्ड बदलकर चुना हुआ बैकअप लोड होगा। आगे बढ़ें?'))return;
+ const reader=new FileReader();
+ reader.onload=()=>{try{
+  const obj=JSON.parse(reader.result);
+  if(obj.app!=='SHUDDH MILK'||!obj.data)throw new Error('Invalid backup');
+  Object.entries(obj.data).forEach(([k,v])=>{if(['farmers','customers','milk','sales','payments','rates','settings'].includes(k))save(k,v)});
+  render();alert('बैकअप सफलतापूर्वक रीस्टोर हो गया।');
+ }catch(e){alert('यह SHUDDH MILK का सही बैकअप नहीं है।');}};
+ reader.readAsText(file);
+}
+
+render();
+</script></body></html>
