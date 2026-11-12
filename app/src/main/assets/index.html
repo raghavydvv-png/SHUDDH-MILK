@@ -2,227 +2,156 @@
 <html lang="hi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SHUDDH MILK</title>
-
 <style>
 *{box-sizing:border-box}
-body{
- margin:0;
- font-family:Arial,sans-serif;
- background:#f1f5f9;
- color:#222;
-}
-header{
- background:#087b45;
- color:white;
- padding:22px;
- text-align:center;
-}
-header h2{margin:0}
+body{margin:0;background:#f1f5f9;font-family:Arial;color:#222}
+header{background:#087b45;color:white;padding:20px;text-align:center}
 .container{padding:15px}
-.card{
- background:white;
- padding:16px;
- margin-bottom:15px;
- border-radius:12px;
- box-shadow:0 2px 8px #ddd;
-}
-input,button{
- width:100%;
- padding:13px;
- margin:7px 0;
- border-radius:8px;
- border:1px solid #ccc;
- font-size:16px;
-}
-button{
- background:#087b45;
- color:white;
- border:0;
- font-weight:bold;
-}
-.stats{
- display:grid;
- grid-template-columns:1fr 1fr;
- gap:10px;
-}
-.stat{
- background:#e1f5e9;
- padding:15px;
- border-radius:10px;
- text-align:center;
-}
-.stat h3{color:#087b45}
-table{
- width:100%;
- border-collapse:collapse;
- font-size:13px;
-}
-td,th{
- border-bottom:1px solid #ddd;
- padding:9px 4px;
- text-align:center;
-}
-.delete{background:#dc2626;padding:7px}
+.card{background:white;padding:16px;border-radius:12px;margin-bottom:15px}
+h3{color:#087b45;margin-top:0}
+label{display:block;margin-top:12px;font-weight:bold}
+input,select,button{width:100%;padding:13px;margin-top:6px;border:1px solid #ccc;border-radius:8px;font-size:16px}
+button{background:#087b45;color:white;border:0;font-weight:bold;margin-top:15px}
+.result{background:#e5f7eb;padding:15px;border-radius:10px;margin-top:15px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+td,th{padding:9px;border:1px solid #ddd;text-align:center}
 </style>
 </head>
-
 <body>
 
 <header>
 <h2>🥛 SHUDDH MILK</h2>
-<p>Milk Collection Management</p>
+<p>दूध संग्रह एवं हिसाब किताब</p>
 </header>
 
 <div class="container">
 
-<div class="stats">
-<div class="stat">
-कुल दूध
-<h3 id="totalMilk">0 L</h3>
-</div>
-<div class="stat">
-कुल रकम
-<h3 id="totalAmount">₹0</h3>
-</div>
-</div>
-
 <div class="card">
-<h3>➕ दूध की नई एंट्री</h3>
+<h3>दूध की एंट्री</h3>
 
+<label>ग्राहक का नाम</label>
 <input id="name" placeholder="ग्राहक का नाम">
 
-<input id="mobile" type="tel" placeholder="मोबाइल नंबर">
+<label>दूध का प्रकार</label>
+<select id="type">
+<option>गाय का दूध</option>
+<option>भैंस का दूध</option>
+</select>
 
-<input id="date" type="date">
+<label>दूध की मात्रा (किलो)</label>
+<input type="number" id="qty" step="0.01" placeholder="जैसे 5">
 
-<input id="liter" type="number" step="0.01"
-placeholder="दूध (लीटर)">
+<label>Fat %</label>
+<input type="number" id="fat" step="0.1" placeholder="जैसे 4.0">
 
-<input id="rate" type="number" step="0.01"
-placeholder="रेट प्रति लीटर">
+<label>SNF %</label>
+<input type="number" id="snf" step="0.1" placeholder="जैसे 8.5">
 
-<button onclick="addMilk()">दूध जमा करें</button>
+<label>रेट प्रति किलो (₹)</label>
+<input type="number" id="rate" step="0.01" placeholder="रेट डालें">
+
+<button onclick="addMilk()">हिसाब जोड़ें</button>
+
+<div class="result">
+<h3>कुल रुपये: ₹<span id="total">0.00</span></h3>
+</div>
 </div>
 
 <div class="card">
-<h3>📋 दूध का रिकॉर्ड</h3>
-
-<div style="overflow-x:auto">
+<h3>दैनिक दूध रजिस्टर</h3>
 <table>
 <thead>
 <tr>
 <th>नाम</th>
-<th>लीटर</th>
+<th>किलो</th>
+<th>Fat</th>
+<th>SNF</th>
 <th>रेट</th>
-<th>रकम</th>
-<th>हटाएं</th>
+<th>रुपये</th>
 </tr>
 </thead>
 <tbody id="records"></tbody>
 </table>
-</div>
+<h3>कुल दूध: <span id="milkTotal">0</span> किलो</h3>
+<h3>कुल रकम: ₹<span id="moneyTotal">0</span></h3>
+<button onclick="downloadCSV()">रिपोर्ट डाउनलोड करें</button>
 </div>
 
 </div>
 
 <script>
-
-let entries=JSON.parse(
- localStorage.getItem("milkData") || "[]"
-);
-
-document.getElementById("date").value=
-new Date().toISOString().split("T")[0];
-
-function save(){
- localStorage.setItem(
- "milkData",JSON.stringify(entries)
- );
-}
+let data=JSON.parse(localStorage.getItem("milkData")||"[]");
 
 function addMilk(){
-
 let name=document.getElementById("name").value.trim();
-let mobile=document.getElementById("mobile").value;
-let date=document.getElementById("date").value;
-let liter=Number(document.getElementById("liter").value);
+let qty=Number(document.getElementById("qty").value);
+let fat=Number(document.getElementById("fat").value);
+let snf=Number(document.getElementById("snf").value);
 let rate=Number(document.getElementById("rate").value);
+let type=document.getElementById("type").value;
 
-if(!name || !date || liter<=0 || rate<=0){
- alert("कृपया सभी जरूरी जानकारी भरें");
- return;
+if(!name||qty<=0||fat<=0||snf<=0||rate<=0){
+alert("सभी जानकारी सही से भरें");
+return;
 }
 
-entries.push({
- name,mobile,date,liter,rate,
- amount:liter*rate
-});
+let amount=qty*rate;
 
-save();
-show();
+data.push({date:new Date().toLocaleDateString(),name,type,qty,fat,snf,rate,amount});
 
+localStorage.setItem("milkData",JSON.stringify(data));
+document.getElementById("total").innerText=amount.toFixed(2);
 document.getElementById("name").value="";
-document.getElementById("mobile").value="";
-document.getElementById("liter").value="";
+document.getElementById("qty").value="";
+document.getElementById("fat").value="";
+document.getElementById("snf").value="";
 document.getElementById("rate").value="";
-
-alert("दूध की एंट्री सफल हुई!");
-
+showData();
 }
 
-function removeMilk(index){
- if(confirm("क्या आप यह रिकॉर्ड हटाना चाहते हैं?")){
- entries.splice(index,1);
- save();
- show();
- }
-}
-
-function show(){
-
+function showData(){
 let html="";
-let milk=0;
-let amount=0;
+let q=0,m=0;
 
-entries.forEach((e,i)=>{
-
-milk+=e.liter;
-amount+=e.amount;
-
-html+=`
-<tr>
-<td>${escapeHTML(e.name)}</td>
-<td>${e.liter}</td>
-<td>₹${e.rate}</td>
-<td>₹${e.amount.toFixed(2)}</td>
-<td>
-<button class="delete"
-onclick="removeMilk(${i})">X</button>
-</td>
+data.forEach(x=>{
+html+=`<tr>
+<td>${escapeHTML(x.name)}</td>
+<td>${x.qty}</td>
+<td>${x.fat}</td>
+<td>${x.snf}</td>
+<td>${x.rate}</td>
+<td>${x.amount.toFixed(2)}</td>
 </tr>`;
-
+q+=x.qty;
+m+=x.amount;
 });
 
 document.getElementById("records").innerHTML=html;
-
-document.getElementById("totalMilk").innerText=
-milk.toFixed(2)+" L";
-
-document.getElementById("totalAmount").innerText=
-"₹"+amount.toFixed(2);
-
+document.getElementById("milkTotal").innerText=q.toFixed(2);
+document.getElementById("moneyTotal").innerText=m.toFixed(2);
 }
 
-function escapeHTML(text){
- return String(text).replace(/[&<>"']/g,
- c=>({"&":"&amp;","<":"&lt;",">":"&gt;",
- '"':"&quot;","'":"&#39;"}[c]));
+function escapeHTML(s){
+return String(s).replace(/[&<>"']/g,c=>({
+"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+}[c]));
 }
 
-show();
+function downloadCSV(){
+let rows=[["Date","Name","Type","Kg","Fat","SNF","Rate","Amount"]];
+data.forEach(x=>rows.push([x.date,x.name,x.type,x.qty,x.fat,x.snf,x.rate,x.amount]));
+let csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(",")).join("\n");
+let blob=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8"});
+let a=document.createElement("a");
+a.href=URL.createObjectURL(blob);
+a.download="SHUDDH-MILK-Report.csv";
+a.click();
+URL.revokeObjectURL(a.href);
+}
 
+showData();
 </script>
 </body>
 </html>
