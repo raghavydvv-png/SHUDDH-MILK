@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SHUDDH MILK</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;
+ font-family:Arial,sans-serif;
+ background:#f1f5f9;
+ color:#222;
+}
+header{
+ background:#087b45;
+ color:white;
+ padding:22px;
+ text-align:center;
+}
+header h2{margin:0}
+.container{padding:15px}
+.card{
+ background:white;
+ padding:16px;
+ margin-bottom:15px;
+ border-radius:12px;
+ box-shadow:0 2px 8px #ddd;
+}
+input,button{
+ width:100%;
+ padding:13px;
+ margin:7px 0;
+ border-radius:8px;
+ border:1px solid #ccc;
+ font-size:16px;
+}
+button{
+ background:#087b45;
+ color:white;
+ border:0;
+ font-weight:bold;
+}
+.stats{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:10px;
+}
+.stat{
+ background:#e1f5e9;
+ padding:15px;
+ border-radius:10px;
+ text-align:center;
+}
+.stat h3{color:#087b45}
+table{
+ width:100%;
+ border-collapse:collapse;
+ font-size:13px;
+}
+td,th{
+ border-bottom:1px solid #ddd;
+ padding:9px 4px;
+ text-align:center;
+}
+.delete{background:#dc2626;padding:7px}
+</style>
+</head>
+
+<body>
+
+<header>
+<h2>🥛 SHUDDH MILK</h2>
+<p>Milk Collection Management</p>
+</header>
+
+<div class="container">
+
+<div class="stats">
+<div class="stat">
+कुल दूध
+<h3 id="totalMilk">0 L</h3>
+</div>
+<div class="stat">
+कुल रकम
+<h3 id="totalAmount">₹0</h3>
+</div>
+</div>
+
+<div class="card">
+<h3>➕ दूध की नई एंट्री</h3>
+
+<input id="name" placeholder="ग्राहक का नाम">
+
+<input id="mobile" type="tel" placeholder="मोबाइल नंबर">
+
+<input id="date" type="date">
+
+<input id="liter" type="number" step="0.01"
+placeholder="दूध (लीटर)">
+
+<input id="rate" type="number" step="0.01"
+placeholder="रेट प्रति लीटर">
+
+<button onclick="addMilk()">दूध जमा करें</button>
+</div>
+
+<div class="card">
+<h3>📋 दूध का रिकॉर्ड</h3>
+
+<div style="overflow-x:auto">
+<table>
+<thead>
+<tr>
+<th>नाम</th>
+<th>लीटर</th>
+<th>रेट</th>
+<th>रकम</th>
+<th>हटाएं</th>
+</tr>
+</thead>
+<tbody id="records"></tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<script>
+
+let entries=JSON.parse(
+ localStorage.getItem("milkData") || "[]"
+);
+
+document.getElementById("date").value=
+new Date().toISOString().split("T")[0];
+
+function save(){
+ localStorage.setItem(
+ "milkData",JSON.stringify(entries)
+ );
+}
+
+function addMilk(){
+
+let name=document.getElementById("name").value.trim();
+let mobile=document.getElementById("mobile").value;
+let date=document.getElementById("date").value;
+let liter=Number(document.getElementById("liter").value);
+let rate=Number(document.getElementById("rate").value);
+
+if(!name || !date || liter<=0 || rate<=0){
+ alert("कृपया सभी जरूरी जानकारी भरें");
+ return;
+}
+
+entries.push({
+ name,mobile,date,liter,rate,
+ amount:liter*rate
+});
+
+save();
+show();
+
+document.getElementById("name").value="";
+document.getElementById("mobile").value="";
+document.getElementById("liter").value="";
+document.getElementById("rate").value="";
+
+alert("दूध की एंट्री सफल हुई!");
+
+}
+
+function removeMilk(index){
+ if(confirm("क्या आप यह रिकॉर्ड हटाना चाहते हैं?")){
+ entries.splice(index,1);
+ save();
+ show();
+ }
+}
+
+function show(){
+
+let html="";
+let milk=0;
+let amount=0;
+
+entries.forEach((e,i)=>{
+
+milk+=e.liter;
+amount+=e.amount;
+
+html+=`
+<tr>
+<td>${escapeHTML(e.name)}</td>
+<td>${e.liter}</td>
+<td>₹${e.rate}</td>
+<td>₹${e.amount.toFixed(2)}</td>
+<td>
+<button class="delete"
+onclick="removeMilk(${i})">X</button>
+</td>
+</tr>`;
+
+});
+
+document.getElementById("records").innerHTML=html;
+
+document.getElementById("totalMilk").innerText=
+milk.toFixed(2)+" L";
+
+document.getElementById("totalAmount").innerText=
+"₹"+amount.toFixed(2);
+
+}
+
+function escapeHTML(text){
+ return String(text).replace(/[&<>"']/g,
+ c=>({"&":"&amp;","<":"&lt;",">":"&gt;",
+ '"':"&quot;","'":"&#39;"}[c]));
+}
+
+show();
+
+</script>
+</body>
+</html>
